@@ -10,10 +10,9 @@
  * Timings are preliminary.
  */
 
-#include "lcd_conf.h"
+#include "lcd.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "lcd.h"
 
 
 #define LCD_PUT_DELAY			(1)			/* ms, 255 us did not work well. */
@@ -65,8 +64,6 @@ void lcd_putchar(char c)
 
 void lcd_init(void)
 {
-	unsigned char cmds[] = {0x0C, 0x38, 0x06, 0x80};
-
 	_delay_ms(100);
 #if defined(LCD_DATA_PAR)
 	LCD_DATA_DDR    |= 0xFF;
@@ -80,45 +77,62 @@ void lcd_init(void)
 	LCD_RS_DDR |= (1 << LCD_RS_PIN);
 	LCD_EN_PORT &= ~(1 << LCD_EN_PIN);
 	LCD_RS_PORT &= ~(1 << LCD_RS_PIN);
-	for (int i = 0; i < sizeof(cmds); i++)
-		lcd_putdata(cmds[i]);
-	lcd_clear_display();
+
+#if LCD_BARE_MIN
+	/* Just output the commands, some functions unavailable. */
+	lcd_putdata(0x0C);
+	lcd_putdata(0x38);
+	lcd_putdata(0x06);
+	lcd_putdata(0x80);
+#else
+	/* Do it properly. */
+	lcd_on_off_control(1, 0, 0);
+	lcd_function_set(1, 1, 0);
+	lcd_entry_mode_set(1, 0);
+	lcd_set_ddram_address(0);
+#endif
+	lcd_clear();
 }
 
-void lcd_clear_display(void)
+void lcd_clear(void)
 {
 	lcd_putdata(1);
 }
 
-void lcd_return_home(void)
+void lcd_set_ddram_address(uint8_t add)
 {
-	lcd_putdata(1 << 1);
-	_delay_us(1520);
+	lcd_putdata((1 << 7) | (0x7F & add));
+	_delay_us(37);
 }
 
 #if !LCD_BARE_MIN
 
-void lcd_entry_mode_set(int id, int s)
+void lcd_home(void)
 {
-	lcd_putdata((1 << 2) | (id << 1) | (s << 0));
+	lcd_putdata(2);
+}
+
+void lcd_entry_mode_set(uint8_t inc_one, uint8_t shift)
+{
+	lcd_putdata((1 << 2) | (inc_one << 1) | (shift << 0));
 	_delay_us(37);
 }
 
-void lcd_display_on_off_control(int d, int c, int b)
+void lcd_on_off_control(uint8_t disp, uint8_t cursor, uint8_t blink)
 {
-	lcd_putdata((1 << 3) | (d << 2) | (c << 1) | (b << 0));
+	lcd_putdata((1 << 3) | (disp << 2) | (cursor << 1) | (blink << 0));
 	_delay_us(37);
 }
 
-void lcd_cursor_or_display_shift(int sc, int rl)
+void lcd_cursor_or_display_shift(uint8_t sc, uint8_t rl)
 {
 	lcd_putdata((1 << 4) | (sc << 3) | (rl << 2));
 	_delay_us(37);
 }
 
-void lcd_function_set(int dl, int n, int f)
+void lcd_function_set(uint8_t full_itf, uint8_t multi_line, uint8_t f)
 {
-	lcd_putdata((1 << 5) | (dl << 4) | (n << 3) | (f << 2));
+	lcd_putdata((1 << 5) | (full_itf << 4) | (multi_line << 3) | (f << 2));
 	_delay_us(37);
 }
 
@@ -139,12 +153,14 @@ void lcd_puts(const char *s)
 	}
 }
 
-#endif
-
-void lcd_set_ddram_address(uint8_t add)
+void lcd_set_cursor(uint8_t on)
 {
-	lcd_putdata((1 << 7) | (0x7F & add));
-	_delay_us(37);
+	lcd_on_off_control(1, on, 0);
+}
+
+void lcd_set_position(uint8_t line, uint8_t col)
+{
+	lcd_set_ddram_address(line * 64 + col);
 }
 
 void lcd_try(void)
@@ -152,7 +168,10 @@ void lcd_try(void)
 	_delay_ms(100);
 	lcd_init();
 	for (;;) {
+		/* lcd_home(); */
 		lcd_set_ddram_address(0);
+		/* _delay_ms(10); */
+#if 0
 		for (int i = 0; i < 16; i++)
 			lcd_putchar('a' + i);
 		lcd_set_ddram_address(61);
@@ -160,7 +179,25 @@ void lcd_try(void)
 		for (int i = 0; i < 16; i++)
 			lcd_putchar('A' + i);
 		_delay_ms(500);
-		lcd_clear_display();
+		lcd_clear();
 		_delay_ms(500);
+#else
+		const char msg[] = "by tommyo";
+		lcd_puts("avr_hd44780");
+		_delay_ms(500);
+		lcd_set_ddram_address(61);
+		lcd_set_cursor(1);
+		_delay_ms(500);
+		for (uint8_t i = 0; i < sizeof(msg)-1; i++) {
+			_delay_ms(150);
+			lcd_putchar(msg[i]);
+		}
+		_delay_ms(500);
+		lcd_set_cursor(0);
+		lcd_clear();
+		_delay_ms(500);
+#endif
 	}
 }
+
+#endif

@@ -3,9 +3,14 @@ TARGET=attiny13
 ISP=usbasp
 
 CC=avr-gcc
-CFLAGS=-Wall -Os -std=c99 -I. -mmcu=$(TARGET)
+CFLAGS=-Wall -Os -std=c99 -I. -mmcu=$(TARGET) -DF_CPU=8000000L
+ifeq ($(TARGET), atmega88)
+	CFLAGS:=$(CFLAGS) -DLCD_DATA_PAR
+else ifeq ($(TARGET), attiny13)
+	CFLAGS:=$(CFLAGS) -DLCD_DATA_SER
+endif
 
-# clkdiv 8
+# # clkdiv 8
 # HFUSE=0xdf
 # LFUSE=0x62
 # EFUSE=0x01
@@ -15,6 +20,7 @@ HFUSE=0xDF
 LFUSE=0xE2
 EFUSE=0x01
 
+# clkdiv 1
 HFUSE_TINY=0xFF
 LFUSE_TINY=0x7A
 
@@ -41,17 +47,18 @@ flash: main.hex
 	avrdude -c ${ISP} -p ${TARGET} -U flash:w:main.hex
 
 setfuse:
+ifeq ($(TARGET), atmega88)
 	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:w:$(HFUSE):m -U lfuse:w:$(LFUSE):m -U efuse:w:$(EFUSE):m
+else ifeq ($(TARGET), attiny13)
+	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:w:$(HFUSE_TINY):m -U lfuse:w:$(LFUSE_TINY):m
+endif
 
 readfuse:
+ifeq ($(TARGET), atmega88)
 	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:r:-:h -U lfuse:r:-:h -U efuse:r:-:h
-
-setfuse_tiny:
-	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:w:$(HFUSE_TINY):m -U lfuse:w:$(LFUSE_TINY):m
-
-readfuse_tiny:
+else ifeq ($(TARGET), attiny13)
 	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:r:-:h -U lfuse:r:-:h
-
+endif
 
 avrdude:
 	avrdude -c ${ISP} -p ${TARGET} -v

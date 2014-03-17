@@ -1,8 +1,9 @@
 #ifndef LCD_CONF_H
 #define LCD_CONF_H
 
-#define F_CPU 8000000L
-#define LCD_DATA_SER			/* One of LCD_DATA_[PAR, SER]. */
+#if 0							/* Defined in Makefile. */
+#define LCD_DATA_PAR			/* One of LCD_DATA_[PAR, SER]. */
+#endif
 
 #define LCD_BARE_MIN			(0) /* Turn on for smaller binary. */
 
@@ -21,7 +22,7 @@
 #define LCD_RS_DDR				(DDRD)
 #define LCD_RS_PIN				(4)
 
-#elif defined(LCD_DATA_SER)		/* Example setting, data via SR. */
+#elif defined(LCD_DATA_SER)		/* Example settings, data via SR. */
 
 #define LCD_DATA_SREG_CP_DDR	(DDRB)
 #define LCD_DATA_SREG_CP_PORT	(PORTB)
