@@ -1,4 +1,5 @@
-TARGET=atmega88
+# TARGET=atmega88
+TARGET=attiny13
 ISP=usbasp
 
 CC=avr-gcc
@@ -13,6 +14,9 @@ CFLAGS=-Wall -Os -std=c99 -I. -mmcu=$(TARGET)
 HFUSE=0xDF
 LFUSE=0xE2
 EFUSE=0x01
+
+HFUSE_TINY=0xFF
+LFUSE_TINY=0x7A
 
 .PHONY: clean all flash
 
@@ -41,6 +45,13 @@ setfuse:
 
 readfuse:
 	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:r:-:h -U lfuse:r:-:h -U efuse:r:-:h
+
+setfuse_tiny:
+	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:w:$(HFUSE_TINY):m -U lfuse:w:$(LFUSE_TINY):m
+
+readfuse_tiny:
+	avrdude -c ${ISP} -p ${TARGET} -u -U hfuse:r:-:h -U lfuse:r:-:h
+
 
 avrdude:
 	avrdude -c ${ISP} -p ${TARGET} -v

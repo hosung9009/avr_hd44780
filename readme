@@ -1,0 +1,7 @@
+These are some simple functions for working with an hd44780 compatible
+display. The code supports a mode where the eight data pins are
+connected to a shift register, and thus the display only requires four
+pins from the AVR. Tested with the ATmega88 and the 8-pin ATtiny13A.
+
+I could not find something similar from a quick check, so I thought
+I'd share. Do what you wish with the stuff.

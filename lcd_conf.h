@@ -23,20 +23,20 @@
 
 #elif defined(LCD_DATA_SER)		/* Example setting, data via SR. */
 
-#define LCD_DATA_SREG_CP_DDR	(DDRC)
-#define LCD_DATA_SREG_CP_PORT	(PORTC)
+#define LCD_DATA_SREG_CP_DDR	(DDRB)
+#define LCD_DATA_SREG_CP_PORT	(PORTB)
 #define LCD_DATA_SREG_CP_PIN	(3)
 
-#define LCD_DATA_SREG_DS_DDR	(DDRC)
-#define LCD_DATA_SREG_DS_PORT	(PORTC)
+#define LCD_DATA_SREG_DS_DDR	(DDRB)
+#define LCD_DATA_SREG_DS_PORT	(PORTB)
 #define LCD_DATA_SREG_DS_PIN	(2)
 
-#define LCD_EN_DDR				(DDRC)
-#define LCD_EN_PORT				(PORTC)
+#define LCD_EN_DDR				(DDRB)
+#define LCD_EN_PORT				(PORTB)
 #define LCD_EN_PIN				(1)
 
-#define LCD_RS_DDR				(DDRC)
-#define LCD_RS_PORT				(PORTC)
+#define LCD_RS_DDR				(DDRB)
+#define LCD_RS_PORT				(PORTB)
 #define LCD_RS_PIN				(0)
 
 #else
