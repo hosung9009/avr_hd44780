@@ -1,9 +1,9 @@
-# TARGET=atmega88
+#TARGET=atmega88
 TARGET=attiny13
 ISP=usbasp
 
 CC=avr-gcc
-CFLAGS=-Wall -Os -std=c99 -I. -mmcu=$(TARGET) -DF_CPU=8000000L
+CFLAGS=-Wall -Wextra -Os -std=c99 -I. -mmcu=$(TARGET) -DF_CPU=8000000L
 ifeq ($(TARGET), atmega88)
 	CFLAGS:=$(CFLAGS) -DLCD_DATA_PAR
 else ifeq ($(TARGET), attiny13)

@@ -44,9 +44,6 @@ void lcd_set_cgram_address(unsigned char add);
 void lcd_set_cursor(uint8_t on);
 void lcd_set_position(uint8_t line, uint8_t col);
 
-/* Prints a short message on the display. */
-void lcd_try(void);
-
 #endif
 
 #endif
