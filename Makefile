@@ -28,7 +28,7 @@ LFUSE_TINY=0x7A
 
 all: main.hex
 
-%.o: %.c
+%.o: %.c Makefile
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

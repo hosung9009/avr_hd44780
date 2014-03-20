@@ -168,7 +168,7 @@ void lcd_set_cgram_address(uint8_t add)
 
 void lcd_set_position(uint8_t line, uint8_t col)
 {
-	lcd_set_ddram_address(line * 64 + col);
+	lcd_set_ddram_address(line * 0x40 + col);
 }
 
 #endif
